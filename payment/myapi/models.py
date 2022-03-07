@@ -10,5 +10,10 @@ class customer(models.Model):
     phone = models.CharField(max_length=60)
     postal_Address = models.CharField(max_length=60)
 
+class phoneNumber(models.Model):
+    phonenumber=models.CharField(max_length=50)
+
+    
+    
     def __str__(self):
         return self.name

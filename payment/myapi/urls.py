@@ -7,5 +7,10 @@ from . import views
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('',views.getData),
-    path('addcustomer',views.addcustomer)
+    path('addcustomer',views.addcustomer),
+    path('getdetailphoneNumber/<str:pk>',views.getdetailphoneNumber),
+    path('getphone',views.getphoneNumber),
+    path('addphone',views.addphone),
+    path('safaricomauth',views.safaricomauth),
+    path('stkpush/<str:phone>',views.stkpush)
 ]
