@@ -45,7 +45,7 @@ def stkpush(request,phone,cost):
         "PartyA": 254720163490,
         "PartyB": 174379,
         "PhoneNumber": phone,
-        "CallBackURL": "https://posthere.io/dcba-4aee-a108",
+        "CallBackURL": "https://darajambili.herokuapp.com/express-payment",
         "AccountReference": "E-commerce X",
         "TransactionDesc": "Payment of products XYZ" 
     }
@@ -124,8 +124,8 @@ def mpesaresp(request):
 @csrf_exempt
 def webhook(request):
     if request.method == 'POST':
-        print("Data received from Webhook is: ", request.body)
-        return HttpResponse("Webhook received!")
+        #print("Data received from Webhook is: ", request.body)
+        return HttpResponse(request.body)
 
 
 
