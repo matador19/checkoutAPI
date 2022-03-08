@@ -14,7 +14,9 @@ import base64
 from rest_framework import viewsets
 
 
-def safaricomauth(request):
+
+
+def stkpush(request,phone,cost):
     #Customer ID
     customer_key = "P5giKpFolWJzLQAqsLWYPJH7GWdS3X2A"
     # Customer secret
@@ -25,12 +27,10 @@ def safaricomauth(request):
     base64_credentials = base64.b64encode(credentials.encode("utf8"))
     credential = base64_credentials.decode("utf8")
     response = requests.request("GET", 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', headers = { 'Authorization': 'Basic '+credential })
-    print(response.text.encode('utf8'))
-    return render(request,'safaricom.html',context={'response':response})
-
-def stkpush(request,phone,cost):
+    response=response.json()
+    token=response['access_token']
     headers = {
-    'Authorization': 'Bearer NAW1c50YGP3tmSOX9nzzDTmt9rgH',
+    'Authorization': 'Bearer '+token,
      'Content-Type': 'application/json',
     }
     payload = {

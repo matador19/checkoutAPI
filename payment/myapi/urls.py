@@ -11,7 +11,7 @@ urlpatterns = [
     path('getdetailphoneNumber/<str:pk>',views.getdetailphoneNumber),
     path('getphone',views.getphoneNumber),
     path('addphone',views.addphone),
-    path('safaricomauth',views.safaricomauth),
+    #path('safaricomauth',views.safaricomauth),
     path('stkpush/<str:phone>/<str:cost>',views.stkpush),
     path('getcart',views.getcart),
     path('addcart',views.addcart)
