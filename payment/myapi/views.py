@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import cartSerializer, phoneSerializer
+from .serializers import cartSerializer, phoneSerializer,mpesarespSerializer
 from .models import cart, phoneNumber
 from .models import customer
 from .serializers import customerSerializer
@@ -12,6 +12,9 @@ import requests
 import json
 import base64
 from rest_framework import viewsets
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 
@@ -42,12 +45,14 @@ def stkpush(request,phone,cost):
         "PartyA": 254720163490,
         "PartyB": 174379,
         "PhoneNumber": phone,
-        "CallBackURL": "https://mydomain.com/path",
+        "CallBackURL": "https://posthere.io/dcba-4aee-a108",
         "AccountReference": "E-commerce X",
         "TransactionDesc": "Payment of products XYZ" 
     }
     response = requests.request("POST", 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', headers = headers, json=payload)
     return render(request,'stkpush.html',context={'response':response})
+    
+
 
 
 def ctob(request):
@@ -108,8 +113,19 @@ def addcart(request):
         serializer.save()
     return Response(serializer.data)
 
+#mpesa response
+@api_view(['POST'])
+def mpesaresp(request):
+    serializer=mpesarespSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
 
-
+@csrf_exempt
+def webhook(request):
+    if request.method == 'POST':
+        print("Data received from Webhook is: ", request.body)
+        return HttpResponse("Webhook received!")
 
 
 

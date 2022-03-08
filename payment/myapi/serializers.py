@@ -1,6 +1,7 @@
-from dataclasses import field
+from dataclasses import field, fields
 from rest_framework import serializers
-from .models import cart, phoneNumber
+
+from .models import cart, phoneNumber,mpesaresp
 from .models import customer
 
 class customerSerializer(serializers.HyperlinkedModelSerializer):
@@ -17,3 +18,8 @@ class cartSerializer(serializers.ModelSerializer):
     class Meta:
         model = cart
         fields = ('__all__')
+
+class mpesarespSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=mpesaresp
+        fields=('__all__')

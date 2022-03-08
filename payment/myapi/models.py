@@ -18,6 +18,10 @@ class cart(models.Model):
     desc=models.CharField(max_length=60)
     price=models.IntegerField()
 
+class mpesaresp(models.Model):
+    pass
+
+
     
     
     def __str__(self):
