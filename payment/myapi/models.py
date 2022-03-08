@@ -13,6 +13,11 @@ class customer(models.Model):
 class phoneNumber(models.Model):
     phonenumber=models.CharField(max_length=50)
 
+class cart(models.Model):
+    item=models.CharField(max_length=50)
+    desc=models.CharField(max_length=60)
+    price=models.IntegerField()
+
     
     
     def __str__(self):
