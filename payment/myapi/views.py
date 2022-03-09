@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import cartSerializer, phoneSerializer,mpesarespSerializer
+from .serializers import cartSerializer, phoneSerializer,mpesarespSerializer,mpesaExprSucSerializer
 from .models import cart, phoneNumber
 from .models import customer
 from .serializers import customerSerializer
@@ -45,7 +45,7 @@ def stkpush(request,phone,cost):
         "PartyA": 254720163490,
         "PartyB": 174379,
         "PhoneNumber": phone,
-        "CallBackURL": "https://darajambili.herokuapp.com/express-payment",
+        "CallBackURL": "https://posthere.io/d5ed-4cdc-ba91",
         "AccountReference": "E-commerce X",
         "TransactionDesc": "Payment of products XYZ" 
     }
@@ -115,17 +115,43 @@ def addcart(request):
 
 #mpesa response
 @api_view(['POST'])
-def mpesaresp(request):
-    serializer=mpesarespSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
-
 @csrf_exempt
 def webhook(request):
-    if request.method == 'POST':
-        #print("Data received from Webhook is: ", request.body)
-        return HttpResponse(request.body)
+        #json_data = json.loads(str(request.body, encoding='utf-8'))
+        json_data=request.body
+        json_data = json.loads(json_data)
+        request_desc=json_data['Body']['stkCallback']['ResultDesc']
+        if request_desc=='Request cancelled by user':
+            json_data_declined=json_data['Body']['stkCallback']
+            serializer=mpesarespSerializer(data=json_data_declined)
+            #print(json_data_declined)
+            if serializer.is_valid():
+                serializer.save()
+            return Response(serializer.data)
+
+        elif request_desc=='The service request is processed successfully.':
+            json_data_accepted=json_data['Body']['stkCallback']['CallbackMetadata']['Item']
+            json_data_accepted_processed={
+                'PhoneNumber':json_data_accepted[4]['Value'],
+                'Amount':json_data_accepted[0]['Value'],
+                'TransactionDate':json_data_accepted[3]['Value'],
+                'MpesaReceiptNumber':json_data_accepted[1]['Value']
+            }
+            print(json_data_accepted_processed)
+            serializer=mpesaExprSucSerializer(data=json_data_accepted_processed)
+            if serializer.is_valid():
+                #print('true')
+                serializer.save()
+            return Response(serializer.data)
+        
+       
+       
+
+
+        
+        
+        
+
 
 
 

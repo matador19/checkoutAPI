@@ -19,7 +19,16 @@ class cart(models.Model):
     price=models.IntegerField()
 
 class mpesaresp(models.Model):
-    pass
+    MerchantRequestID=models.CharField(max_length=50,null=True)
+    CheckoutRequestID=models.CharField(max_length=50,null=True)
+    ResultDesc=models.CharField(max_length=50,null=True)
+    ResultCode=models.IntegerField(null=True)
+
+class mpesaExprSuc(models.Model):
+    PhoneNumber=models.BigIntegerField(null=True)
+    Amount = models.FloatField(null=True)
+    TransactionDate= models.BigIntegerField(null=True)
+    MpesaReceiptNumber= models.CharField(max_length=50,null=True)
 
 
     
