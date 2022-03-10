@@ -2,7 +2,7 @@ from dataclasses import field, fields
 from pyexpat import model
 from rest_framework import serializers
 
-from .models import cart, phoneNumber,mpesaresp, mpesaExprSuc
+from .models import cart, phoneNumber,mpesaresp, mpesaExprSuc, CheckoutRequestID
 from .models import customer
 
 class customerSerializer(serializers.HyperlinkedModelSerializer):
@@ -30,3 +30,8 @@ class mpesaExprSucSerializer(serializers.ModelSerializer):
         model = mpesaExprSuc
         fields = ('__all__')
         #'id','PhoneNumber','Amount','TransactionDate','MpesaReceiptNumber'
+
+class CheckoutRequestIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckoutRequestID
+        fields = ('__all__')

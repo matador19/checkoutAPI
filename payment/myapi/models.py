@@ -29,6 +29,10 @@ class mpesaExprSuc(models.Model):
     Amount = models.FloatField(null=True)
     TransactionDate= models.BigIntegerField(null=True)
     MpesaReceiptNumber= models.CharField(max_length=50,null=True)
+    CheckoutRequestID=models.CharField(max_length=70,null=True)
+
+class CheckoutRequestID(models.Model):
+    CheckoutRequestID=models.CharField(max_length=70)
 
 
     

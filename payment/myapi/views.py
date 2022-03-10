@@ -1,19 +1,23 @@
+from audioop import reverse
 from email import header
+from multiprocessing import context
+from time import sleep, time
 from urllib import response
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import redirect, render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .serializers import cartSerializer, phoneSerializer,mpesarespSerializer,mpesaExprSucSerializer
-from .models import cart, phoneNumber
+from .models import cart, phoneNumber,CheckoutRequestID, mpesaExprSuc,mpesaresp
 from .models import customer
-from .serializers import customerSerializer
+from .serializers import customerSerializer, CheckoutRequestIDSerializer
 import requests
 import json
 import base64
 from rest_framework import viewsets
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import ast
 
 
 
@@ -45,13 +49,19 @@ def stkpush(request,phone,cost):
         "PartyA": 254720163490,
         "PartyB": 174379,
         "PhoneNumber": phone,
-        "CallBackURL": "https://posthere.io/d5ed-4cdc-ba91",
+        #change here
+        "CallBackURL": "https://9af4-41-90-115-26.ngrok.io/webhook",
         "AccountReference": "E-commerce X",
         "TransactionDesc": "Payment of products XYZ" 
     }
     response = requests.request("POST", 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', headers = headers, json=payload)
+    response=json.loads(response.text)
+    CheckoutRequestID={'CheckoutRequestID':response['CheckoutRequestID']}
+    serializer=CheckoutRequestIDSerializer(data=CheckoutRequestID)
+    if serializer.is_valid():
+        #print('done')
+        serializer.save()
     return render(request,'stkpush.html',context={'response':response})
-    
 
 
 
@@ -113,11 +123,13 @@ def addcart(request):
         serializer.save()
     return Response(serializer.data)
 
+request_desc=""
 #mpesa response
 @api_view(['POST'])
 @csrf_exempt
 def webhook(request):
         #json_data = json.loads(str(request.body, encoding='utf-8'))
+    if request.method =='POST':
         json_data=request.body
         json_data = json.loads(json_data)
         request_desc=json_data['Body']['stkCallback']['ResultDesc']
@@ -131,22 +143,62 @@ def webhook(request):
 
         elif request_desc=='The service request is processed successfully.':
             json_data_accepted=json_data['Body']['stkCallback']['CallbackMetadata']['Item']
+            json_data_CheckoutRequestID= json_data['Body']['stkCallback']['CheckoutRequestID']
             json_data_accepted_processed={
                 'PhoneNumber':json_data_accepted[4]['Value'],
                 'Amount':json_data_accepted[0]['Value'],
                 'TransactionDate':json_data_accepted[3]['Value'],
-                'MpesaReceiptNumber':json_data_accepted[1]['Value']
+                'MpesaReceiptNumber':json_data_accepted[1]['Value'],
+                'CheckoutRequestID': json_data_CheckoutRequestID
             }
-            print(json_data_accepted_processed)
+           # print(json_data_accepted_processed)
             serializer=mpesaExprSucSerializer(data=json_data_accepted_processed)
             if serializer.is_valid():
-                #print('true')
+                print('true')
                 serializer.save()
             return Response(serializer.data)
-        
-       
-       
 
+        
+def checkpayment(request):
+    CheckoutID= CheckoutRequestID.objects.values('CheckoutRequestID')
+    PassedCheckoutID=mpesaExprSuc.objects.values('CheckoutRequestID')
+    Transcode=mpesaExprSuc.objects.values('MpesaReceiptNumber')
+    Amount=mpesaExprSuc.objects.values('Amount')
+    phone=mpesaExprSuc.objects.values('PhoneNumber')
+    FailedCheckoutID=mpesaresp.objects.values('CheckoutRequestID')
+    A=len(CheckoutID)
+    B=len(PassedCheckoutID)
+    C=len(FailedCheckoutID)
+    D=len(Transcode)
+    E=len(Amount)
+    F=len(phone)
+   # print(CheckoutID[A-1]['CheckoutRequestID'])
+    #print(PassedCheckoutID[B-1]['CheckoutRequestID'])
+    #print(FailedCheckoutID[C-1]['CheckoutRequestID'])
+    context={
+        'CheckoutID':CheckoutID[A-1]['CheckoutRequestID'],
+        'PassedCheckoutID':PassedCheckoutID[B-1]['CheckoutRequestID'],
+        'FailedCheckoutID':FailedCheckoutID[C-1]['CheckoutRequestID'],
+        'code':Transcode[D-1]['MpesaReceiptNumber'],
+        'Amount':Amount[E-1]['Amount'],
+        'phone':phone[F-1]['PhoneNumber']
+    }
+    failedcontext={
+        'CheckoutID':CheckoutID[A-1]['CheckoutRequestID'],
+        'PassedCheckoutID':PassedCheckoutID[B-1]['CheckoutRequestID'],
+        'FailedCheckoutID':FailedCheckoutID[C-1]['CheckoutRequestID'],
+    }
+
+    if CheckoutID[A-1]==FailedCheckoutID[C-1]:
+        return JsonResponse(failedcontext)
+    elif CheckoutID[A-1]==PassedCheckoutID[B-1]:
+        return JsonResponse(context)
+     #   return render(request,'passed.html',context)
+    else:
+        return JsonResponse(failedcontext)
+
+
+       
 
         
         

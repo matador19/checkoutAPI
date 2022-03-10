@@ -8,12 +8,9 @@
         </head>
         <body>
           <div class="container align-items-center" style="margin-top: 250px; text-align: center;">
-            <div> <div class="spinner-border text-success" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            </div>
-          <h3>Push notification sent. Please input your Mpesa pin</h3>
-          <a href="https://9af4-41-90-115-26.ngrok.io/check"><button>Payment done</button></a>
+            {% load static %}
+            <img style="height: 75px; width: 75px;" src="{% static 'failed.png' %}" alt="My image">
+            <h3>Something wrong happened</h3>
           </div>
         </body>
 </html>

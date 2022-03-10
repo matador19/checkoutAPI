@@ -14,5 +14,6 @@ urlpatterns = [
     path('webhook',webhook),
     path('stkpush/<str:phone>/<str:cost>',views.stkpush),
     path('getcart',views.getcart),
-    path('addcart',views.addcart)
+    path('addcart',views.addcart),
+    path('check',views.checkpayment)
 ]
