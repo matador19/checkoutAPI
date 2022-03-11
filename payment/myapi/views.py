@@ -50,7 +50,7 @@ def stkpush(request,phone,cost):
         "PartyB": 174379,
         "PhoneNumber": phone,
         #change here
-        "CallBackURL": "https://9af4-41-90-115-26.ngrok.io/webhook",
+        "CallBackURL": "https://e8cc-41-90-115-26.ngrok.io/webhook",
         "AccountReference": "E-commerce X",
         "TransactionDesc": "Payment of products XYZ" 
     }
@@ -61,7 +61,7 @@ def stkpush(request,phone,cost):
     if serializer.is_valid():
         #print('done')
         serializer.save()
-    return render(request,'stkpush.html',context={'response':response})
+    return redirect('http://localhost:3000/')
 
 
 
@@ -187,6 +187,9 @@ def checkpayment(request):
         'CheckoutID':CheckoutID[A-1]['CheckoutRequestID'],
         'PassedCheckoutID':PassedCheckoutID[B-1]['CheckoutRequestID'],
         'FailedCheckoutID':FailedCheckoutID[C-1]['CheckoutRequestID'],
+        'code': None,
+        'Amount': None,
+        'phone': None
     }
 
     if CheckoutID[A-1]==FailedCheckoutID[C-1]:
